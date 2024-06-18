@@ -412,3 +412,130 @@ def get_string_second(number):
         return "пятдесят девять секунд"
     if number == 60:
         return "шестдесят секунд"
+    def get_string_second(number):
+        if number == 1:
+            return "одна секунда"
+        if number == 2:
+            return "две секунды"
+        if number == 3:
+            return "три секунды"
+        if number == 4:
+            return "четыре секунды"
+        if number == 5:
+            return "пять секунд"
+        if number == 6:
+            return "шесть секунд"
+        if number == 7:
+            return "семь секунд"
+        if number == 8:
+            return "восемь секунд"
+        if number == 9:
+            return "девять секунд"
+        if number == 10:
+            return "десять секунд"
+        if number == 11:
+            return "одиннадцать секунд"
+        if number == 12:
+            return "двенадцать секунд"
+        if number == 13:
+            return "тренадцать секунд"
+        if number == 14:
+            return "четырнадцать секунд"
+        if number == 15:
+            return "пятнадцать секунд"
+        if number == 16:
+            return "шестналцать секунд"
+        if number == 17:
+            return "семнадцать секунд"
+        if number == 18:
+            return "восемнадцать секунд"
+        if number == 19:
+            return "девятнадцать секунд"
+        if number == 20:
+            return "двадцать секунд"
+        if number == 21:
+            return "двадцать одна секунда"
+        if number == 22:
+            return "двадцать две секунды"
+        if number == 23:
+            return "двадцать три секунды"
+        if number == 24:
+            return "двадцать четыре секунды"
+        if number == 25:
+            return "двадцать пять секунд"
+        if number == 26:
+            return "двадцать шесть секунд"
+        if number == 27:
+            return "двадцать семь секунд"
+        if number == 28:
+            return "двадцать восемь секунд"
+        if number == 29:
+            return "двадцать девять секунд"
+        if number == 30:
+            return "тридцать секунд"
+        if number == 31:
+            return "тридцать одна секунда"
+
+def get_string_day(number):
+    if number == 1:
+        return "один день"
+    if number == 2:
+        return "два дня"
+    if number == 3:
+        return "три дня"
+    if number == 4:
+        return "четыре дня"
+    if number == 5:
+        return "пять дней"
+    if number == 6:
+        return "шесть дней"
+    if number == 7:
+        return "семь дней"
+    if number == 8:
+        return "восемь дней"
+    if number == 9:
+        return "девять дней"
+    if number == 10:
+        return "десять дней"
+    if number == 11:
+        return "одиннадцать дней"
+    if number == 12:
+        return "двенадцать дней"
+    if number == 13:
+        return "тренадцать дней"
+    if number == 14:
+        return "четырнадцать дней"
+    if number == 15:
+        return "пятнадцать дней"
+    if number == 16:
+        return "шестналцать дней"
+    if number == 17:
+        return "семнадцать дней"
+    if number == 18:
+        return "восемнадцать дней"
+    if number == 19:
+        return "девятнадцать дней"
+    if number == 20:
+        return "двадцать дней"
+    if number == 21:
+        return "двадцать один день"
+    if number == 22:
+        return "двадцать два дня"
+    if number == 23:
+        return "двадцать три дня"
+    if number == 24:
+        return "двадцать четыре дня"
+    if number == 25:
+        return "двадцать пять дней"
+    if number == 26:
+        return "двадцать шесть дней"
+    if number == 27:
+        return "двадцать семь дней"
+    if number == 28:
+        return "двадцать восемь дней"
+    if number == 29:
+        return "двадцать девять дней"
+    if number == 30:
+        return "тридцать дней"
+    if number == 31:
+        return "тридцать один день"

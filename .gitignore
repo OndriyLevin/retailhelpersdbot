@@ -1,2 +1,4 @@
 .env
 .pyc
+model.pt
+test.wav

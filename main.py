@@ -4,7 +4,11 @@ import datetime
 from datetime import datetime, timedelta
 import pytz
 import time_to_string
+import torch
+
 from dotenv import load_dotenv
+from telebot import types
+
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path)
@@ -12,7 +16,19 @@ bot = telebot.TeleBot(os.environ.get('TOKEN_BOT'))
 
 SdTz = pytz.timezone('Asia/Yekaterinburg')
 
-from telebot import types
+device = torch.device('cpu')
+torch.set_num_threads(4)
+local_file = 'model.pt'
+
+if not os.path.isfile(local_file):
+    torch.hub.download_url_to_file('https://models.silero.ai/models/tts/ru/v4_ru.pt',
+                                   local_file)
+
+model = torch.package.PackageImporter(local_file).load_pickle("tts_models", "model")
+model.to(device)
+
+sample_rate = 48000
+speaker='baya'
 
 def get_next_pay_date():
 
@@ -53,14 +69,14 @@ def time_until_end_of_workday():
     print(weekday)
     begin_of_workday = datetime.now(tz=SdTz).replace(hour=8, minute=0, second=0, microsecond=0)
     if weekday < 4:
-        end_of_workday = datetime.now(tz=SdTz).replace(hour=17, minute=0, second=0, microsecond=0)  # рабочий день заканчивается в 17:00
+        end_of_workday = datetime.now(tz=SdTz).replace(hour=23, minute=0, second=0, microsecond=0)  # рабочий день заканчивается в 17:00
     else:
         end_of_workday = datetime.now(tz=SdTz).replace(hour=16, minute=0, second=0, microsecond=0)  # рабочий день заканчивается в 16:00
 
     if current_time < begin_of_workday:
-        return "Работа ещё не началась, спи"
+        return "Работа ещё не началась. Вставай!"
     if current_time > end_of_workday:
-        return "Работа уже кончилась, спи"
+        return "Работа уже кончилась. Спи!"
 
     time_left = end_of_workday - current_time
 
@@ -99,11 +115,28 @@ def start(message):
 @bot.message_handler(content_types=['text'])
 def start(message):
 
-    print(message.date)
     if message.text == 'Сколько до зарплаты?':
         payday_date = get_next_pay_date()
-        bot.send_message(message.from_user.id, "До зарплаты осталось {} дней".format(days_until_payday(payday_date)))
+        # bot.send_message(message.from_user.id, "До зарплаты осталось {} ".format(time_to_string.get_string_day(days_until_payday(payday_date))))
+        string_message = "До зарплаты осталось {} ".format(time_to_string.get_string_day(days_until_payday(payday_date)))
+        audio_paths = model.save_wav(text=string_message,
+                                     speaker=speaker,
+                                     sample_rate=sample_rate)
+        print(audio_paths)
+        voice = open(audio_paths, 'rb')
+        print(voice)
+        bot.send_voice(message.from_user.id, voice)
+        bot.send_voice(message.from_user.id, "FILEID")
     elif message.text == 'Сколько до конца рабочего дня?':
-        bot.send_message(message.from_user.id, time_until_end_of_workday())
+        string_message = time_until_end_of_workday()
+        audio_paths = model.save_wav(text=string_message,
+                                     speaker=speaker,
+                                     sample_rate=sample_rate)
+        print(audio_paths)
+        voice = open(audio_paths, 'rb')
+        print(voice)
+        bot.send_voice(message.from_user.id, voice)
+        bot.send_voice(message.from_user.id, "FILEID")
+        # bot.send_message(message.from_user.id, time_until_end_of_workday())
 
 bot.polling(none_stop=True, interval=0) #обязательная для работы бота часть
