@@ -49,6 +49,7 @@ def start(message):
 @bot.message_handler(content_types=['text'])
 def start(message):
     
+    print(message)
     if message.text == 'Сколько до зарплаты?':
         payday_date = datetime(2024, 6, 21)  # здесь нужно указать дату вашей зарплаты
         bot.send_message(message.from_user.id, "До зарплаты осталось {} дней".format(days_until_payday(payday_date)))
