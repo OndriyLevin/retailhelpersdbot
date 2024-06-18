@@ -13,6 +13,32 @@ SdTz = pytz.timezone('Asia/Yekaterinburg')
 
 from telebot import types
 
+def get_next_pay_date():
+
+    today = datetime.now(tz=SdTz).date()
+    if today.day > 5 and today.day < 21:
+        pay_year = today.year
+        pay_month = today.month
+        pay_day = 21
+    else:
+        if today.month > 11:
+            pay_year = today.year + 1
+            pay_month = 1
+        else:
+            pay_year = today.year
+            pay_month = today.month + 1
+        pay_day = 5
+    payday_date = datetime(pay_year, pay_month, pay_day, tzinfo=SdTz)
+
+    weekday = payday_date.weekday()
+    if weekday == 5:
+        pay_day = pay_day - 1
+    if weekday == 6:
+        pay_day = pay_day + 1
+
+    payday_date = datetime(pay_year, pay_month, pay_day, tzinfo=SdTz)
+    return payday_date
+
 def days_until_payday(payday_date):
     today = datetime.now(tz=SdTz).date()
     days_left = (payday_date.date() - today).days
@@ -68,7 +94,7 @@ def start(message):
 
     print(message.date)
     if message.text == 'Сколько до зарплаты?':
-        payday_date = datetime(2024, 6, 21, tzinfo=SdTz)  # здесь нужно указать дату вашей зарплаты
+        payday_date = get_next_pay_date()
         bot.send_message(message.from_user.id, "До зарплаты осталось {} дней".format(days_until_payday(payday_date)))
     elif message.text == 'Сколько до конца рабочего дня?':
         bot.send_message(message.from_user.id, time_until_end_of_workday())
