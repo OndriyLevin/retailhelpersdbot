@@ -3,6 +3,7 @@ import os
 import datetime
 from datetime import datetime, timedelta
 import pytz
+import time_to_string
 from dotenv import load_dotenv
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 if os.path.exists(dotenv_path):
@@ -68,13 +69,19 @@ def time_until_end_of_workday():
     seconds_left = int(time_left.total_seconds() % 60)
 
     # Сопоставим каждому временному интервалу его текстовое описание
-    time_description = "До конца рабочего дня осталось "
+    time_description = "До конца рабочего дня осталось: "
     if hours_left > 0:
-        time_description += "{} ч ".format(hours_left)
+        # time_description += "{} ч ".format(hours_left)
+        time_description += time_to_string.get_string_hour(hours_left)
+        time_description += ' '
     if minutes_left > 0:
-        time_description += "{} мин ".format(minutes_left)
+        # time_description += "{} мин ".format(minutes_left)
+        time_description += time_to_string.get_string_minute(minutes_left)
+        time_description += ' '
     if seconds_left > 0:
-        time_description += "{} сек".format(seconds_left)
+        # time_description += "{} сек".format(seconds_left)
+        time_description += time_to_string.get_string_second(seconds_left)
+        time_description += ' '
     if time_description == "До конца рабочего дня осталось ":
         time_description = "Уже всё, иди домой"
 
