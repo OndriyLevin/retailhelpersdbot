@@ -1,6 +1,7 @@
 import telebot
 import os
-import time
+import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 if os.path.exists(dotenv_path):
@@ -8,6 +9,33 @@ if os.path.exists(dotenv_path):
 bot = telebot.TeleBot(os.environ.get('TOKEN_BOT'))
 
 from telebot import types
+
+def days_until_payday(payday_date):
+    today = datetime.now().date()
+    days_left = (payday_date.date() - today).days
+    return max(days_left, 0)  # если зарплата уже сегодня, вернем 0, чтобы не было отрицательного значения
+
+def time_until_end_of_workday():
+    end_of_workday = datetime.now().replace(hour=17, minute=0, second=0, microsecond=0)  # предположим, что рабочий день заканчивается в 17:00
+    current_time = datetime.now()
+    time_left = end_of_workday - current_time
+
+    hours_left = int(time_left.total_seconds() // 3600)
+    minutes_left = int((time_left.total_seconds() % 3600) // 60)
+    seconds_left = int(time_left.total_seconds() % 60)
+
+    # Сопоставим каждому временному интервалу его текстовое описание
+    time_description = "До конца рабочего дня осталось "
+    if hours_left > 0:
+        time_description += "{} ч ".format(hours_left)
+    if minutes_left > 0:
+        time_description += "{} мин ".format(minutes_left)
+    if seconds_left > 0:
+        time_description += "{} сек".format(seconds_left)
+    if time_description == "До конца рабочего дня осталось ":
+        time_description = "Уже всё, иди домой"
+
+    return time_description
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -21,9 +49,10 @@ def start(message):
 @bot.message_handler(content_types=['text'])
 def start(message):
     
-    if message.text == 'Сколько до конца рабочего дня?':
-        bot.send_message(message.from_user.id, "Пока не ебу")
-    elif message.text == 'Сколько до зарплаты?':
-        bot.send_message(message.from_user.id, 'Пока не ебу')
+    if message.text == 'Сколько до зарплаты?':
+        payday_date = datetime(2024, 6, 21)  # здесь нужно указать дату вашей зарплаты
+        bot.send_message(message.from_user.id, "До зарплаты осталось {} дней".format(days_until_payday(payday_date)))
+    elif message.text == 'Сколько до конца рабочего дня?':
+        bot.send_message(message.from_user.id, time_until_end_of_workday())
 
 bot.polling(none_stop=True, interval=0) #обязательная для работы бота часть
