@@ -1,10 +1,6 @@
 import telebot
 import os
-
 import functions
-import time_to_string
-# import torch
-
 from dotenv import load_dotenv
 from telebot import types
 

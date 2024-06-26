@@ -3,3 +3,8 @@
 model.pt
 test.wav
 users.json
+logs/*.log
+**/logs/
+*.tmp
+temp/*
+RHSB/*
