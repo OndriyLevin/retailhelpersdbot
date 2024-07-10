@@ -16,9 +16,9 @@ COPY functions.py .
 COPY lestat.gif.mp4 .
 COPY main.py .
 COPY quote.json .
-COPY time_to_string.py .
 COPY ufo.jpg .
 COPY users.json .
+COPY today.json .
 
 # Определяем команду для запуска вашего бота
 CMD ["python", "main.py"]
