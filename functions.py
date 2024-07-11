@@ -119,7 +119,6 @@ def save_user(user, chat_id):
         for item in users['users']:
             if user in item['user']:
                 finded = True
-        print(finded)
         if finded==False:
             new_user = {
                 'user': user,
@@ -128,8 +127,12 @@ def save_user(user, chat_id):
                 'jija_today': False,
             }
             users['users'].append(new_user)
-            file.seek(0)
-            json.dump(users, file, indent=4)
+
+    os.remove('users.json')
+
+    with open('users.json', 'w+') as file:
+        json.dump(users, file, indent=4)
+           
 
 def get_random_chat_id():
     
@@ -174,8 +177,11 @@ def update_today():
         today_json = json.load(file)
         if new_today != today_json:
             reset_users=True
-            file.seek(0)
-            json.dump(new_today, file, indent=4)
+
+    os.remove('today.json')
+
+    with open('today.json', 'w') as file:
+        json.dump(new_today, file, indent=4)
 
     if reset_users:
         with open('users.json', 'r+') as file:
@@ -183,5 +189,8 @@ def update_today():
             for user in users['users']:
                 user['quote_today']=False
                 user['jija_today']=False
-            file.seek(0)
+
+        os.remove('users.json')
+
+        with open('users.json', 'w+') as file:
             json.dump(users, file, indent=4)
