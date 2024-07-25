@@ -11,9 +11,6 @@ bot = telebot.TeleBot(os.environ.get('TOKEN_BOT'))
 
 functions.init()
 
-await_send_message=False
-working_day_end=False
-
 @bot.message_handler(commands=['start'])
 def start(message):
 
@@ -117,19 +114,6 @@ def start(message):
                         bot.send_message(user[1], 'Члебобасы вернули бота после процедуры зондирования')
                     except:
                         print(user[0])
-    # elif message.text == 'Написать всем':
-    #     if message.from_user.username == 'LevinAndrey':
-    #         await_send_message=True
-    #         bot.send_message(message.from_user.id, 'Что я должен всем отправить?')
-    # elif await_send_message:
-    #     await_send_message=False
-    #     if message.from_user.username == 'LevinAndrey':
-    #         users = functions.get_users()
-    #         for user in users['users']:
-    #             try:
-    #                 bot.send_message(user['chat_id'], message.text)
-    #             except:
-    #                 print(user['user'])
 
 @bot.inline_handler(lambda query: len(query.query) > 0)
 def query_text(query):
