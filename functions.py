@@ -3,11 +3,14 @@ import datetime
 import pytz
 import json
 import os
+import DB
 
 from datetime import datetime, timedelta
 
 SdTz = pytz.timezone('Asia/Yekaterinburg')
 
+def init():
+    DB.init()
 def get_next_pay_date():
 
     today = datetime.now(tz=SdTz).date()
@@ -39,11 +42,13 @@ def get_next_pay_date():
     return payday_date
 
 def days_until_payday(payday_date):
+
     today = datetime.now(tz=SdTz).date()
     days_left = (payday_date.date() - today).days
     return max(days_left, 0)  # если зарплата уже сегодня, вернем 0, чтобы не было отрицательного значения
 
 def time_until_end_of_workday():
+
     current_time = datetime.now(tz=SdTz)
     weekday = current_time.weekday()
     if weekday > 4:
@@ -69,15 +74,12 @@ def time_until_end_of_workday():
     time_description = "До конца рабочего дня осталось: "
     if hours_left > 0:
         time_description += "{} ч ".format(hours_left)
-        # time_description += time_to_string.get_string_hour(hours_left)
         time_description += ' '
     if minutes_left > 0:
         time_description += "{} мин ".format(minutes_left)
-        # time_description += time_to_string.get_string_minute(minutes_left)
         time_description += ' '
     if seconds_left > 0:
         time_description += "{} сек".format(seconds_left)
-        # time_description += time_to_string.get_string_second(seconds_left)
         time_description += ' '
     if time_description == "До конца рабочего дня осталось ":
         time_description = "Уже всё, иди домой"
@@ -86,78 +88,46 @@ def time_until_end_of_workday():
 
 def what_white_jija(user_request):
     
-    with open('users.json', 'r+') as file:
-        users = json.load(file)
-        for user in users['users']:
-            if user['user'] == user_request:
-                if user['jija_today']:
-                    message = 'Ты уже запрашивал жижу, приходи завтра за новой'
-                else:
-                    random_value = random.random() * 100
-                    if random_value < 10:
-                        message = 'Стакан выскальнул из рук и упал. Теперь неизвестно какая белая жижа была у тебя'
-                    if random_value > 10 and random_value < 50:
-                        message = 'В стакане ты чувствуешь кисловатый привкус. Жижа рабочая'
-                    if random_value > 50 and random_value < 95:
-                        message = 'В стакане ты чувствуешь сладкий привкус. Жижа не рабочая'
-                    if random_value > 95:
-                        message = '😏🍆💦'
-                    user['jija_today']=True
-
-    os.remove('users.json')
-
-    with open('users.json', 'w+') as file:
-        json.dump(users, file, indent=4)
+    if DB.check_and_toggle_user_jija(user_request)[0] == 1:
+        message = 'Ты уже запрашивал жижу, приходи завтра за новой'
+    else:
+        random_value = random.random() * 100
+        if random_value < 10:
+            message = 'Стакан выскальнул из рук и упал. Теперь неизвестно какая белая жижа была у тебя'
+        if random_value > 10 and random_value < 50:
+            message = 'В стакане ты чувствуешь кисловатый привкус. Жижа рабочая'
+        if random_value > 50 and random_value < 95:
+            message = 'В стакане ты чувствуешь сладкий привкус. Жижа не рабочая'
+        if random_value > 95:
+            message = '😏🍆💦'
 
     return message
 
 def save_user(user, chat_id):
     
-    with open('users.json', 'r+') as file:
-        finded = False
-        users = json.load(file)
-        for item in users['users']:
-            if user in item['user']:
-                finded = True
-        if finded==False:
-            new_user = {
-                'user': user,
-                'chat_id': chat_id,
-                'quote_today': False,
-                'jija_today': False,
-            }
-            users['users'].append(new_user)
-
-    os.remove('users.json')
-
-    with open('users.json', 'w+') as file:
-        json.dump(users, file, indent=4)
-           
-
-def get_random_chat_id():
-    
-    with open('users.json', 'r+') as file:
-        users = json.load(file)
-        random_user = users['users'][random.randrange(len(users['users']))]
-        print(random_user['user'])
-        return random_user['chat_id']
+    DB.new_user(user, chat_id)
     
 def get_users():
     
-    with open('users.json', 'r+') as file:
-        return json.load(file)    
+    return DB.get_users()
+
+def is_admin(user):
+
+    return DB.check_user_admin_rights(user)
+
+def user_is_exist(user):
+
+    return DB.is_saved_user(user)
     
 def get_random_quote():
     
-    with open('quote.json', encoding='utf-8') as file:
-        quotes = json.load(file)
-        random_quote = quotes['quotes'][random.randrange(len(quotes['quotes']))]
-        return random_quote['quote']
+    quotes = DB.get_quotes()
+    random_quote = quotes[random.randrange(len(quotes))]
+    return random_quote[1]
 
 def get_all_quotes():
-    with open('quote.json', 'r+', encoding='utf-8') as file:
-        all_quotes = json.load(file)
-        return all_quotes
+
+    return DB.get_quotes()
 def get_lestat_gif():
     
     return open('lestat.gif.mp4', 'rb')
@@ -184,13 +154,4 @@ def update_today():
         json.dump(new_today, file, indent=4)
 
     if reset_users:
-        with open('users.json', 'r+') as file:
-            users = json.load(file)
-            for user in users['users']:
-                user['quote_today']=False
-                user['jija_today']=False
-
-        os.remove('users.json')
-
-        with open('users.json', 'w+') as file:
-            json.dump(users, file, indent=4)
+        DB.reset_jija()
