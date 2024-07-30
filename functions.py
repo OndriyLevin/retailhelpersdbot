@@ -4,6 +4,7 @@ import pytz
 import json
 import os
 import DB
+import UserModel
 
 from datetime import datetime, timedelta
 
@@ -86,26 +87,9 @@ def time_until_end_of_workday():
 
     return time_description
 
-def what_white_jija(user_request):
-    
-    if DB.check_and_toggle_user_jija(user_request)[0] == 1:
-        message = 'Ты уже запрашивал жижу, приходи завтра за новой'
-    else:
-        random_value = random.random() * 100
-        if random_value < 10:
-            message = 'Стакан выскальнул из рук и упал. Теперь неизвестно какая белая жижа была у тебя'
-        if random_value > 10 and random_value < 50:
-            message = 'В стакане ты чувствуешь кисловатый привкус. Жижа рабочая'
-        if random_value > 50 and random_value < 95:
-            message = 'В стакане ты чувствуешь сладкий привкус. Жижа не рабочая'
-        if random_value > 95:
-            message = '😏🍆💦'
-
-    return message
-
 def save_user(user, chat_id):
-    
-    DB.new_user(user, chat_id)
+    new_user = UserModel.User(user, chat_id)
+    new_user.save_to_db()
     
 def get_users():
     

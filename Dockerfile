@@ -19,6 +19,8 @@ COPY quote.json .
 COPY ufo.jpg .
 COPY today.json .
 COPY DB.py .
+COPY env_utils.py .
+COPY UserModel.py .
 
 # Определяем команду для запуска вашего бота
 CMD ["python", "main.py"]

@@ -1,15 +1,10 @@
 import sqlite3
-import os
-import dotenv
 import json
+import env_utils
 def get_connection():
-    
-    dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-    if os.path.exists(dotenv_path):
-        dotenv.load_dotenv(dotenv_path)
         
-    current_tokken = os.environ.get('TOKEN_BOT')
-    test_tokken = os.environ.get('TOKEN_BOT_TEST')
+    current_tokken = env_utils.get_tokken_value('TOKEN_BOT')
+    test_tokken = env_utils.get_tokken_value('TOKEN_BOT_TEST')
     
     if current_tokken == test_tokken:
         return sqlite3.connect('Test.db')
@@ -32,7 +27,10 @@ def init():
     ''')
     
     for quote in quotes['quotes']:
-        cursor.execute('INSERT INTO Quotes (id, quote) VALUES (?, ?)', (quote['id'],quote['quote']))
+        cursor.execute( 'SELECT * FROM Quotes WHERE quote = ?',(quote['quote'],))
+        result = cursor.fetchone()
+        if result == None or result[1] != quote['quote']:
+            cursor.execute('INSERT INTO Quotes (id, quote) VALUES (?, ?)', (quote['id'],quote['quote']))
         
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS Users (
@@ -83,17 +81,12 @@ def get_users():
     
     return result
 
-def new_user(username, chat_id):
+def new_user(username, chat_id, jija_today, admin):
     
     connection = get_connection()
     cursor = connection.cursor()
     
-    if username == 'LevinAndrey':
-        admin = True
-    else:
-        admin = False
-    
-    cursor.execute('INSERT INTO Users (user, chat_id, jija_today, admin) VALUES (?, ?, 0, ?)', (username, chat_id, admin))
+    cursor.execute('INSERT INTO Users (user, chat_id, jija_today, admin) VALUES (?, ?, ?, ?)', (username, chat_id, jija_today,admin))
     connection.commit()
     
     connection.close()
@@ -133,6 +126,7 @@ def get_quotes():
     connection.close()
     
     return result
+
 def check_and_toggle_user_jija(username):
     
     connection = get_connection()
