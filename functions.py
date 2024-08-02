@@ -112,6 +112,23 @@ def get_random_quote():
 def get_all_quotes():
 
     return DB.get_quotes()
+
+def get_all_new_quotes():
+
+    return DB.get_new_quotes()
+
+def new_quote(quote):
+
+    DB.new_quote(quote)
+
+def offer_quote(quote):
+
+    DB.offer_quote(quote)
+
+def deny_quote(quote):
+
+    DB.deny_quote(quote)
+
 def get_lestat_gif():
     
     return open('lestat.gif.mp4', 'rb')

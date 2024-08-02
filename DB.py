@@ -1,5 +1,7 @@
 import sqlite3
 import json
+from socket import create_connection
+
 import env_utils
 def get_connection():
         
@@ -21,8 +23,9 @@ def init():
     
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS Quotes (
-    id INTEGER PRIMARY KEY,
-    quote TEXT NOT NULL
+    id INTEGER,
+    quote TEXT NOT NULL,
+    PRIMARY KEY("id" AUTOINCREMENT)
     )
     ''')
     
@@ -30,7 +33,15 @@ def init():
         cursor.execute( 'SELECT * FROM Quotes WHERE quote = ?',(quote['quote'],))
         result = cursor.fetchone()
         if result == None or result[1] != quote['quote']:
-            cursor.execute('INSERT INTO Quotes (id, quote) VALUES (?, ?)', (quote['id'],quote['quote']))
+            cursor.execute('INSERT INTO Quotes ( quote ) VALUES ( ? )', (quote['quote'],))
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS NewQuotes (
+    id INTEGER,
+    quote TEXT NOT NULL,
+    PRIMARY KEY("id" AUTOINCREMENT)
+    )
+    ''')
         
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS Users (
@@ -126,6 +137,50 @@ def get_quotes():
     connection.close()
     
     return result
+
+def get_new_quotes():
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute( 'SELECT * FROM NewQuotes')
+    result = cursor.fetchall()
+
+    connection.close()
+
+    return result
+
+
+
+def new_quote(quote):
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute('INSERT INTO Quotes (quote) VALUES ( ? )', (quote,))
+    connection.commit()
+
+    connection.close()
+
+def offer_quote(quote):
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute('INSERT INTO NewQuotes (quote) VALUES ( ? )', (quote,))
+    connection.commit()
+
+    connection.close()
+
+def deny_quote(quote):
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute('DELETE FROM NewQuotes WHERE quote = ?', (quote,))
+    connection.commit()
+
+    connection.close()
 
 def check_and_toggle_user_jija(username):
     
