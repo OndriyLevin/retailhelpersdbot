@@ -1,8 +1,4 @@
-from inspect import markcoroutinefunction
-
 import telebot
-from torch.backends.cuda import mem_efficient_sdp_enabled
-
 import functions
 import env_utils
 from UserModel import User
