@@ -40,7 +40,7 @@ def start(message):
     elif message.text == 'Какая сегодня белая жижа?':
         bot.send_message(CurrentUser.chat_id, CurrentUser.what_white_jija())
     elif message.text == 'Случайная цитата':
-        bot.send_message(CurrentUser.chat_id, functions.get_random_quote())
+        bot.send_message(CurrentUser.chat_id, functions.get_random_quote(), reply_markup = create_inline_buttons_random_quote())
     elif message.text == 'Предложить цитату':
         bot.send_message(CurrentUser.chat_id, 'Какая цитата?')
         bot.register_next_step_handler(message, offer_new_quota)
@@ -152,6 +152,14 @@ def create_quote_inline_buttons(index, max_len):
 
     return markup
 
+def create_inline_buttons_random_quote():
+
+    random_button = types.InlineKeyboardButton("🆕",callback_data="random_quote")
+    markup = types.InlineKeyboardMarkup()
+    markup.add( random_button )
+
+    return markup
+
 @bot.inline_handler(lambda query: len(query.query) > 0)
 def query_text(query):
 
@@ -238,5 +246,13 @@ def callback_prev(call):
     index = int(call.data.split("_")[2])
     if index > 0:
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text = new_quotes[index][1], reply_markup = create_quote_inline_buttons(index, len(new_quotes)))
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("random_quote"))
+def callback_random_quote(call):
+
+    bot.edit_message_text(chat_id=call.message.chat.id,
+                              message_id=call.message.message_id,
+                              text = functions.get_random_quote(),
+                              reply_markup = create_inline_buttons_random_quote())
 
 bot.polling(none_stop=True, interval=0) #обязательная для работы бота часть

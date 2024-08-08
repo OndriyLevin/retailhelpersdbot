@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+    telegram_bot:
+        build: .
+        container_name: rhsd_cont
+        volumes:
+            - rhsd_vol:/app/database
+        command: python main.py
+
+volumes:
+    rhsd_vol:

@@ -7,11 +7,11 @@ def get_connection():
         
     current_tokken = env_utils.get_tokken_value('TOKEN_BOT')
     test_tokken = env_utils.get_tokken_value('TOKEN_BOT_TEST')
-    
+
     if current_tokken == test_tokken:
-        return sqlite3.connect('Test.db')
+        return sqlite3.connect('/app/database/Test.db')
     else:
-        return sqlite3.connect('Prod.db')
+        return sqlite3.connect('/app/database/Prod.db')
 
 def init():
     
